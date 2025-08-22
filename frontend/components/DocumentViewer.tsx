@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useRef } from 'react'
 
 type Range = [number, number]
 
+type HighlightType = 'laytime' | 'demurrage' | 'alert'
+
 type Props = {
   text: string
-  clauseRanges: { range: [number, number], type: 'laytime' | 'demurrage' }[]
+  clauseRanges: { range: [number, number], type: HighlightType }[]
   focusRange?: [number, number]
 }
 
@@ -17,7 +19,7 @@ export default function DocumentViewer({ text, clauseRanges, focusRange }: Props
       .filter(r => r.range[1] > r.range[0])
       .sort((a,b) => a.range[0]-b.range[0])
 
-    const out: { t: string, mark?: { start: number, end: number, type: 'laytime' | 'demurrage' } }[] = []
+    const out: { t: string, mark?: { start: number, end: number, type: HighlightType } }[] = []
     let cursor = 0
     for (const { range: [rawS, rawE], type } of ranges) {
       const s = Math.max(cursor, rawS)
@@ -37,12 +39,22 @@ export default function DocumentViewer({ text, clauseRanges, focusRange }: Props
     if (mark) (mark as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [focusRange])
 
-  const color = (type: 'laytime' | 'demurrage') => type === 'laytime' ? 'bg-emerald-200 dark:bg-emerald-700' : 'bg-amber-200 dark:bg-amber-700'
+  const classFor = (type: HighlightType) => {
+    if (type === 'laytime') return 'hl-laytime'
+    if (type === 'demurrage') return 'hl-demurrage'
+    return 'hl-alert'
+  }
+
+  const titleFor = (type: HighlightType) => {
+    if (type === 'laytime') return 'Identified Laytime Clause'
+    if (type === 'demurrage') return 'Identified Demurrage Clause'
+    return 'Alert Evidence'
+  }
 
   return (
     <div ref={containerRef} className="card whitespace-pre-wrap leading-relaxed max-h-[70vh] overflow-auto">
       {parts.map((p, i) => p.mark ? (
-        <mark key={i} data-start={p.mark.start} className={`${color(p.mark.type)} rounded px-0.5`}>
+        <mark key={i} data-start={p.mark.start} className={`${classFor(p.mark.type)} rounded px-0.5`} title={titleFor(p.mark.type)}>
           {p.t}
         </mark>
       ) : p.t)}

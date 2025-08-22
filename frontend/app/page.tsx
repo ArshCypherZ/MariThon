@@ -3,10 +3,13 @@ import Link from 'next/link'
 export default function Home() {
   return (
     <main className="container">
-      <div className="card">
-        <h2 className="text-lg font-medium mb-2">Welcome</h2>
-        <p className="mb-4">Go to your dashboard to view alerts.</p>
-        <Link href="/dashboard" className="btn">Open Dashboard</Link>
+      <div className="card text-center py-12">
+        <div className="text-2xl font-semibold mb-2">MariThon</div>
+        <div className="text-neutral-600 dark:text-neutral-400 mb-6">Voyage Document Analyzer — highlights clauses and alerts automatically</div>
+        <div className="flex items-center justify-center gap-3">
+          <Link href="/sign-in" className="btn">Get Started</Link>
+          <Link href="/dashboard" className="btn" prefetch>Skip sign-in</Link>
+        </div>
       </div>
     </main>
   )

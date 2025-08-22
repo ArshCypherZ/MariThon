@@ -42,10 +42,34 @@ export default function Dashboard() {
     return a.message
   }
 
+  const timeAgo = (iso: string) => {
+    const d = new Date(iso)
+    const ms = Date.now() - d.getTime()
+    const sec = Math.floor(ms / 1000)
+    if (sec < 60) return `${sec}s ago`
+    const min = Math.floor(sec / 60)
+    if (min < 60) return `${min}m ago`
+    const hr = Math.floor(min / 60)
+    if (hr < 24) return `${hr}h ago`
+    const day = Math.floor(hr / 24)
+    return `${day}d ago`
+  }
+
+  const severityBadge = (sev?: string) => {
+    const base = 'badge'
+    const map: Record<string, string> = {
+      high: ' bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-200',
+      medium: ' bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200',
+      low: ' bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200'
+    }
+    const key = (sev || '').toLowerCase()
+    return <span className={base + (map[key] || '')}>{sev || '—'}</span>
+  }
+
   return (
     <main className="container space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Alerts</h2>
+        <h2 className="text-lg font-semibold">Recent Alerts</h2>
         <div className="flex gap-2">
           <button className="btn" onClick={() => { refreshAlerts(); refreshVoyages() }}>Refresh</button>
           {!adding ? (
@@ -61,14 +85,24 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {isLoading && <div className="card">Loading alerts…</div>}
+        {isLoading && Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="card space-y-3">
+            <div className="skeleton h-3 w-24" />
+            <div className="skeleton h-4 w-3/4" />
+            <div className="skeleton h-4 w-2/3" />
+            <div className="skeleton h-8 w-40" />
+          </div>
+        ))}
         {alerts?.map((a: any) => (
           <div key={a.id} className="card">
-            <div className="mb-2 text-sm text-neutral-500">{new Date(a.created_at).toLocaleString()}</div>
+            <div className="mb-2 text-sm text-neutral-500 flex items-center gap-2">
+              <span>{timeAgo(a.created_at)}</span>
+              {severityBadge(a.severity)}
+            </div>
             <div className="font-medium mb-2">⚠️ Laycan Inconsistency</div>
             <div className="mb-3 text-sm">{fmtAlert(a)}</div>
             <div className="flex gap-2">
-              <Link href={`/voyages/${a.voyage_id}?alertId=${a.id}&mode=alert`} className="btn">View</Link>
+              <Link href={`/voyages/${a.voyage_id}?alertId=${a.id}&mode=alert`} className="btn">View Details</Link>
               <Link href={`/voyages/${a.voyage_id}?docId=${a.document_id}`} className="btn">Open Document</Link>
             </div>
           </div>
