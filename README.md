@@ -40,6 +40,42 @@ Prerequisites
    - http://localhost:3000/dashboard
 
 
+## Architecture
+This diagram shows how the frontend, backend, services, and data stores interact.
+
+```
++------------------+
+|  User Browser    |
++------------------+
+          |
+          v
++----------------------------------------+
+| Next.js Frontend                       |
+| - App Router, SWR, shadcn/ui           |
+| - Clerk (auth)                         |
++----------------------------------------+
+          |   HTTP /api
+          v
++----------------------------------------+
+| FastAPI Backend                        |
+| - reads.py (GET: alerts, voyages, ...) |
+| - uploads.py (POST: documents)         |
++----------------------------------------+
+    |                    |  \
+    |                    |   \
+    v                    v    v
++-----------+   +---------------------+   +----------------------+
+| SQLite DB |<--| text_extraction.py  |-->| gemini.py (LLM)      |--> Google GenAI
++-----------+   +---------------------+   +----------------------+
+    ^                    |
+    |                    v
+    |             +----------------+
+    |             | storage.py     |----> Local File Storage
+    |             +----------------+
+    |
+    +---- reads.py queries DB and returns data to frontend
+```
+
 
 ## Roadmap / future integrations
 - LLM/RAG for document QA
