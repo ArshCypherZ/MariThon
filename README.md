@@ -1,40 +1,49 @@
-# MariThon
+# MariThon — Voyage Document Analyzer
 
-Goal: Upload a document, auto-extract key clauses (Laytime, Demurrage), and generate actionable insights (Alerts).
+Upload a charter party document, auto‑extract the key clauses (Laytime/Laycan and Demurrage), and raise actionable alerts (e.g., NOR outside Laycan window). View everything in a clean dashboard and a document viewer with highlighted evidence.
 
-### Monorepo
-- backend: FastAPI + SQLAlchemy + SQLite + local storage + google-genai
-- frontend: Next.js + Clerk + Tailwind
-- storage/: local files (uploaded docs)
+## What it does
+- Upload PDF/DOCX/TXT for a voyage
+- Finds Laytime/Laycan and Demurrage snippets and highlights them
+- Check the Laycan window against a Notice of Readiness (NOR) date and create an alert if inconsistent
+- Browse alerts and voyages, open a document, and jump to the highlighted evidence
 
-### Environment
-- Create `.env` files in backend and frontend (see `.env.example` files in each).
+## Tech stack
+- Backend: FastAPI, SQLAlchemy, SQLite, pdfminer.six, python‑docx, google‑genai
+- Frontend: Next.js (App Router), TypeScript, Tailwind, SWR, shadcn/ui, Clerk (auth)
 
-### Backend
-- Tech: Python 3.10+, FastAPI, SQLAlchemy, pdfminer.six, python-docx, google-genai
-- Env (backend/.env):
-  - GEMINI_API_KEY=...
-  - DATABASE_URL=sqlite:///./app.db
-  - STORAGE_DIR=./storage
-  - MOCK_NOR_DATE=2025-08-15
-- Run:
-  - cd backend
-  - python -m venv venv && source venv/bin/activate
-  - pip install -U -r requirements.txt
-  - uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-- Test Gemini (optional):
-  - PYTHONPATH=. python app/test_gemini.py
+## Quick start (Linux)
+Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Bash, pip, npm
+
+### 1) Backend
+1. Copy env and set values
+   - cp backend/.env.example backend/.env
+2. Create venv and install
+   - cd backend
+   - python -m venv venv && source venv/bin/activate
+   - pip install -U -r requirements.txt
+3. Run API (default http://localhost:8000)
+   - uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+### 2) Frontend
+1. Copy env and set values
+   - cp frontend/.env.example frontend/.env.local
+   - NEXT_PUBLIC_API_BASE should point to the backend (default http://localhost:8000/api)
+2. Install and run
+   - cd frontend
+   - npm install
+   - npm run dev
+3. Open UI
+   - http://localhost:3000/dashboard
 
 
-### Frontend
-- Tech: Next.js (App Router) + TypeScript + Tailwind + Clerk
-- Env (frontend/.env):
-  - NEXT_PUBLIC_API_BASE=http://localhost:8000/api
-  - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
-  - CLERK_SECRET_KEY=...
-- Run:
-  - cd frontend && npm install
-  - npm run dev
 
-### Per‑Voyage NOR configuration
-- Purpose: The alert engine evaluates Laycan against a Notice of Readiness (NOR) date.
+## Roadmap / future integrations
+- LLM/RAG for document QA
+- Voice agent + chat
+  - Conversational “Voyage Copilot” with speech‑to‑text and text‑to‑speech
+  - Realtime call/voice integration to answer questions from the contract corpus
+  - Tool calling to set NOR date, create tasks, or request missing documents
