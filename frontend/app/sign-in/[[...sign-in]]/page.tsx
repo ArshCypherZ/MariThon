@@ -1,10 +1,11 @@
 "use client"
 import { SignIn } from '@clerk/nextjs'
+import Login from '@/components/Login'
 
 export default function Page() {
   return (
-    <div className="container py-10 flex justify-center">
-      <SignIn routing="path" signUpUrl="/sign-up" />
-    </div>
+    <Login>
+      <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+    </Login>
   )
 }
